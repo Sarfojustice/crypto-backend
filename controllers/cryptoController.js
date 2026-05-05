@@ -1,69 +1,52 @@
-// In-memory mock database
-const cryptos = [
-  {
-    id: 1,
-    name: 'Bitcoin',
-    symbol: 'BTC',
-    price: 65000,
-    image: 'https://assets.coingecko.com/coins/images/1/large/bitcoin.png',
-    change24h: '+2.5',
-    createdAt: new Date()
-  },
-  {
-    id: 2,
-    name: 'Ethereum',
-    symbol: 'ETH',
-    price: 3500,
-    image: 'https://assets.coingecko.com/coins/images/279/large/ethereum.png',
-    change24h: '+1.8',
-    createdAt: new Date()
-  },
-  {
-    id: 3,
-    name: 'Solana',
-    symbol: 'SOL',
-    price: 140,
-    image: 'https://assets.coingecko.com/coins/images/4128/large/solana.png',
-    change24h: '-0.5',
-    createdAt: new Date()
-  }
-];
+const Crypto = require('../models/Crypto');
 
 exports.getAllCrypto = async (req, res) => {
-  res.status(200).json({
-    status: 'success',
-    results: cryptos.length,
-    data: { cryptos },
-  });
+  try {
+    const cryptos = await Crypto.find();
+    res.status(200).json({
+      status: 'success',
+      results: cryptos.length,
+      data: { cryptos },
+    });
+  } catch (err) {
+    res.status(400).json({ status: 'fail', message: err.message });
+  }
 };
 
 exports.getGainers = async (req, res) => {
-  const sorted = [...cryptos].sort((a, b) => parseFloat(b.change24h) - parseFloat(a.change24h));
-  res.status(200).json({
-    status: 'success',
-    results: sorted.length,
-    data: { cryptos: sorted },
-  });
+  try {
+    const cryptos = await Crypto.find().sort('-change24h').limit(10);
+    res.status(200).json({
+      status: 'success',
+      results: cryptos.length,
+      data: { cryptos },
+    });
+  } catch (err) {
+    res.status(400).json({ status: 'fail', message: err.message });
+  }
 };
 
 exports.getNewListings = async (req, res) => {
-  const sorted = [...cryptos].sort((a, b) => b.createdAt - a.createdAt);
-  res.status(200).json({
-    status: 'success',
-    results: sorted.length,
-    data: { cryptos: sorted },
-  });
+  try {
+    const cryptos = await Crypto.find().sort('-createdAt').limit(10);
+    res.status(200).json({
+      status: 'success',
+      results: cryptos.length,
+      data: { cryptos },
+    });
+  } catch (err) {
+    res.status(400).json({ status: 'fail', message: err.message });
+  }
 };
 
 exports.createCrypto = async (req, res) => {
-  const newCrypto = {
-    id: cryptos.length + 1,
-    ...req.body,
-    createdAt: new Date()
-  };
-  cryptos.push(newCrypto);
-  res.status(201).json({
-    status: 'success',
-    data: { crypto: newCrypto },
-  });
+  try {
+    const newCrypto = await Crypto.create(req.body);
+    res.status(201).json({
+      status: 'success',
+      data: { crypto: newCrypto },
+    });
+  } catch (err) {
+    res.status(400).json({ status: 'fail', message: err.message });
+  }
 };

@@ -17,16 +17,13 @@ app.use(cors({
   credentials: true
 }));
 
-const DB = process.env.MONGODB_URI || 'mongodb://localhost:27017/coinbase_clone';
+const DB = process.env.MONGODB_URI;
 
-/*
 mongoose.connect(DB).then(() => {
   console.log('DB connection successful!');
 }).catch(err => {
   console.log('DB connection error:', err);
 });
-*/
-console.log('Running in MOCK mode (no MongoDB required)');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/crypto', cryptoRoutes);
